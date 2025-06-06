@@ -14,38 +14,26 @@ SyncFile::SyncFile(std::map<std::string, time_t> json) {
     filesSynchronizationDates = json;
 }
 
-SyncFile::SyncFile(time_t modificationDate) {
-    SyncFile::modificationDate = modificationDate;
-}
-
-SyncFile::SyncFile(std::map<std::string, time_t> json, time_t modificationDate) {
-    SyncFile::modificationDate = modificationDate;
-    filesSynchronizationDates = json;
-}
-
 SyncFile::~SyncFile() {
 }
 
-void SyncFile::toJson() const {
-    std::ofstream JsonFile(std::filesystem::current_path() / "sync_file.json");
-    JsonFile << std::to_string(modificationDate);
+void SyncFile::toJson(std::string absolutePath) const {
+    std::ofstream JsonFile(absolutePath + "sync_file.json");
     JsonFile.close();
 }
 
-void SyncFile::fromJson() {
+// TODO: Implement fromJson
+void SyncFile::fromJson(std::string absolutePath) {
     std::string fileContents;
-    std::ifstream JsonFile(std::filesystem::current_path() / "sync_file.json");
+    std::ifstream JsonFile(absolutePath + "sync_file.json");
+
     while (std::getline(JsonFile, fileContents)) {
     }
     JsonFile.close();
 }
 
-std::map<std::string, UpdateInfo> SyncFile::getDifferences() {
-
-}
-
-time_t SyncFile::getModificationDate() {
-    return modificationDate;
+std::map<std::string, time_t> SyncFile::getFilesSynchronizationDates() const {
+    return filesSynchronizationDates;
 }
 
 time_t SyncFile::getFileSynchronizationDate(std::string relativePath) {

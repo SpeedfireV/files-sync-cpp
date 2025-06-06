@@ -7,6 +7,9 @@
 #include <map>
 #include <string>
 #include <vector>
+#include "../file_handler/FileHandler.h"
+
+
 
 class FilesSynchronizer {
 private:
@@ -25,8 +28,8 @@ public:
     void syncDirectories(std::string const& path); // Path might be master or slave
     void syncAllDirectories();
 
-    [[nodiscard]] static std::vector<time_t> lastSyncs(std::string const& path) ; // Path might be master or slave
-    std::map<std::string, time_t> lastSyncs();
+    time_t lastSyncs(std::string const& path) ; // Path might be master or slave
+    std::map<FileHandler, time_t> lastSyncs();
 };
 
 

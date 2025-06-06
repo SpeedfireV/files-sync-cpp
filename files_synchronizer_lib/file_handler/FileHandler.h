@@ -13,6 +13,7 @@
 
 class FileHandler {
 private:
+    time_t modificationDate; // now
     std::string masterPath;
     std::string slavePath;
     SyncFile masterSyncFile;
@@ -32,7 +33,11 @@ public:
 
     std::vector<std::string> getFilesPathsInDirectory() const;
 
-    void updateFiles(std::string fileRelativePath);
+    std::map<std::string, UpdateInfo> getDifferences() const;
+
+    void updateFiles();
+
+    time_t getModificationDate();
 
     void updateSyncFilesPaths();
 

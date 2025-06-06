@@ -39,16 +39,35 @@ void FilesSynchronizer::clearAllDirectories() {
     dirsForSync.clear();
 }
 
+FileHandler& FilesSynchronizer::getFileHandler(std::string const& path) {
+    for (FileHandler& fh : dirsForSync) {
+        if (fh.getMasterPath() == path || fh.getSlavePath() == path) {
+            return fh;
+        }
+    }
+    throw std::runtime_error("Spierdalaj, nie ma takiego FileHandlera");
+}
+
 void FilesSynchronizer::syncDirectories(std::string const &path) {
+    FileHandler& fh = getFileHandler(path);
+    fh.updateFiles();
 }
 
 void FilesSynchronizer::syncAllDirectories() {
+    for (FileHandler& fh : dirsForSync) {
+        fh.updateFiles();
+    }
+}
+time_t FilesSynchronizer::lastSyncs(std::string const& path) {
+    // return getFileHandler(path).lastSync();
+    return 0; // Placeholder, implement actual logic
 }
 
-[[nodiscard]] std::vector<time_t> FilesSynchronizer::lastSyncs(std::string const &path) {
-    return {};
-}
-
-std::map<std::string, time_t> FilesSynchronizer::lastSyncs() {
-    return {};
+std::map<FileHandler, time_t> FilesSynchronizer::lastSyncs() {
+    std::map<FileHandler, time_t> lastSyncs;
+    for (FileHandler& fh : dirsForSync) {
+        // lastSyncs[fh] = fh.lastSync();
+        lastSyncs[fh] = 0; // Placeholder, implement actual logic
+    }
+    return lastSyncs;
 }

@@ -11,24 +11,21 @@
 #include "../update_info/update_info.h"
 
 
-class SyncFile {private:
-    time_t modificationDate; // now
+class SyncFile {
+private:
     std::map<std::string, time_t> filesSynchronizationDates = std::map<std::string, time_t>();
 
 public:
     SyncFile(); // time_t - now,
     SyncFile(std::map<std::string, time_t> json); // time_t - now,
-    SyncFile(time_t modificationDate);
-    SyncFile(std::map<std::string, time_t> json, time_t modificationDate);
 
 
     ~SyncFile(); // Delete jsons
 
-    void toJson() const; // Save data from that class
-    void fromJson(); // Save data to that class
+    void toJson(std::string absolutePath) const; // Save data from that class
+    void fromJson(std::string absolutePath); // Save data to that class
 
-    std::map<std::string, UpdateInfo> getDifferences();
-    time_t getModificationDate();
+    std::map<std::string, time_t> getFilesSynchronizationDates() const;
     time_t getFileSynchronizationDate(std::string relativePath);
 };
 
