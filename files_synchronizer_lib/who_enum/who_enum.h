@@ -8,8 +8,8 @@
 
 
 enum WhoEnum {
-    Parent,
-    Child
+    Master,
+    Slave
 };
 
 

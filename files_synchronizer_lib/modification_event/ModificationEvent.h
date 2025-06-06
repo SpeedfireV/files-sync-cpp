@@ -7,8 +7,11 @@
 
 
 
-class modification_event {
-
+enum ModificationEvent {
+    None,
+    Updated,
+    Removed,
+    Created
 };
 
 
