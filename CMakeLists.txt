@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.31)
+cmake_minimum_required(VERSION 3.29.6)
 project(PROI_PROJEKT)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -15,6 +15,8 @@ add_executable(PROI_PROJEKT main.cpp
         files_synchronizer_lib/update_info/update_info.cpp
         files_synchronizer_lib/update_info/update_info.h
         files_synchronizer_lib/who_enum/who_enum.cpp
-        files_synchronizer_lib/who_enum/who_enum.h)
-
-add_subdirectory(google_test)
+        files_synchronizer_lib/who_enum/who_enum.h
+        main.cpp
+        main.cpp)
+#
+#add_subdirectory(google_test)

@@ -20,7 +20,7 @@ public:
     SyncFile(std::map<std::string, time_t> json); // time_t - now,
 
 
-    ~SyncFile(); // Delete jsons
+    ~SyncFile() = default;
 
     void toJson(std::string absolutePath) const; // Save data from that class
     void fromJson(std::string absolutePath); // Save data to that class

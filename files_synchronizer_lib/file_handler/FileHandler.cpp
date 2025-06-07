@@ -4,6 +4,8 @@
 
 #include "FileHandler.h"
 
+#include <filesystem>
+
 [[nodiscard]] std::string FileHandler::getMasterPath() const {
     return masterPath;
 }
@@ -15,8 +17,10 @@
 void FileHandler::updateFile(std::string fileRelativePath, WhoEnum from) const {
 }
 
-time_t FileHandler::fileModificationDate(std::string fileRelativePath) const {
-
+time_t FileHandler::fileModificationDate(std::string fileRelativePath, WhoEnum who) const {
+    std::string absolutePath = (who == WhoEnum::Master ? masterPath : slavePath) + fileRelativePath;
+    time_t modificationDate = std::filesystem::last_write_time(absolutePath).time_since_epoch().count();
+    return modificationDate;
 }
 
 void FileHandler::readSyncFiles() {
@@ -26,6 +30,10 @@ FileHandler::~FileHandler() {
 }
 
 FileHandler::FileHandler(std::string masterPath, std::string slavePath) {
+    FileHandler::masterPath = masterPath;
+    FileHandler::slavePath = slavePath;
+    masterSyncFile = SyncFile();
+    slaveSyncFile = SyncFile();
 }
 
 std::vector<std::string> FileHandler::getFilesPathsInDirectory() const {

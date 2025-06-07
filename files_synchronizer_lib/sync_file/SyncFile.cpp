@@ -14,9 +14,6 @@ SyncFile::SyncFile(std::map<std::string, time_t> json) {
     filesSynchronizationDates = json;
 }
 
-SyncFile::~SyncFile() {
-}
-
 void SyncFile::toJson(std::string absolutePath) const {
     std::ofstream JsonFile(absolutePath + "sync_file.json");
     JsonFile.close();
