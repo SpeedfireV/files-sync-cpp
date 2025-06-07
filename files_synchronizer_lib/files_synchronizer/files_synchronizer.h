@@ -9,8 +9,6 @@
 #include <vector>
 #include "../file_handler/FileHandler.h"
 
-
-
 class FilesSynchronizer {
 private:
     std::vector<FileHandler> dirsForSync = std::vector<FileHandler>();

@@ -15,8 +15,8 @@ add_executable(PROI_PROJEKT main.cpp
         files_synchronizer_lib/update_info/update_info.cpp
         files_synchronizer_lib/update_info/update_info.h
         files_synchronizer_lib/who_enum/who_enum.cpp
-        files_synchronizer_lib/who_enum/who_enum.h
-        main.cpp
-        main.cpp)
+        files_synchronizer_lib/who_enum/who_enum.h)
+
+add_executable(MAIN main.cpp)
 
 add_subdirectory(google_test)

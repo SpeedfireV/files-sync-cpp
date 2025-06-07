@@ -7,7 +7,6 @@
 #include "../modification_event/ModificationEvent.h"
 #include "../who_enum/who_enum.h"
 
-
 class UpdateInfo {
 private:
     WhoEnum newer;
@@ -17,10 +16,6 @@ public:
 
     WhoEnum getNewer();
     ModificationEvent getModificationEvent();
-
-
 };
-
-
 
 #endif //UPDATE_INFO_H
