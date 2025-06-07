@@ -19,24 +19,24 @@ private:
     SyncFile masterSyncFile;
     SyncFile slaveSyncFile;
 
-    std::string const& pathFromWhoEnum(WhoEnum who);
+    const std::string& pathFromWhoEnum(WhoEnum who);
 
-    void updateFile(std::string fileRelativePath, WhoEnum from);
-    time_t fileModificationDate(std::string fileRelativePath, WhoEnum who);
+    void updateFile(const std::string& fileRelativePath, WhoEnum from);
+    time_t fileModificationDate(const std::string& fileRelativePath, WhoEnum who);
     void readSyncFiles();
-    std::vector<std::string> getDirectoresPaths(WhoEnum who);
+    std::vector<std::string> getDirectoriesPaths(WhoEnum who);
 
 public:
     ~FileHandler(); // Delete all json files
 
-    FileHandler(std::string masterPath, std::string slavePath);
+    FileHandler(const std::string& masterPath, const std::string& slavePath);
 
-    [[nodiscard]] std::string getMasterPath() const;
-    [[nodiscard]] std::string getSlavePath() const;
+    [[nodiscard]] const std::string& getMasterPath() const;
+    [[nodiscard]] const std::string& getSlavePath() const;
 
     std::vector<std::string> getFilesPathsInDirectory(WhoEnum who);
 
-    std::map<std::string, UpdateInfo> getDifferences() const;
+    [[nodiscard]] std::map<std::string, UpdateInfo> getDifferences() const;
 
     void updateFiles();
 

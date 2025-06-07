@@ -32,7 +32,7 @@ void FilesSynchronizer::removeDirectories(std::string const &path) {
         }
         ++it;
     }
-    std::cout << "Directory not found" << std::endl;
+    throw std::runtime_error("No file handlers with specified path");
 }
 
 void FilesSynchronizer::clearAllDirectories() {
@@ -45,7 +45,7 @@ FileHandler& FilesSynchronizer::getFileHandler(std::string const& path) {
             return fh;
         }
     }
-    throw std::runtime_error("Spierdalaj, nie ma takiego FileHandlera");
+    throw std::runtime_error("No file handlers with specified path");
 }
 
 void FilesSynchronizer::syncDirectories(std::string const &path) {

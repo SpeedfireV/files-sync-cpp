@@ -56,6 +56,8 @@ void printHelp() {
 
 int main() {
     FilesSynchronizer fs;
+    std::cout << "Welcome to files synchronizer\n";
+    std::cout << "Type 'help' for list of commands\n";
     while (true) {
         std::string input;
         std::cout << ">_";
@@ -66,10 +68,10 @@ int main() {
         try {
             switch (stringToCode(cmd.name)) {
                 case StringCode::help: {
-                    if (!cmd.arguments.empty()) {
-                        std::cout << "ERROR: 'help' does not accept arguments\n";
-                    } else {
+                    if (cmd.arguments.empty()) {
                         printHelp();
+                    } else {
+                        std::cout << "ERROR: 'help' does not accept arguments\n";
                     }
                     break;
                 }
@@ -77,8 +79,6 @@ int main() {
                     if (cmd.arguments.size() == 2) {
                         fs.addDirectories(cmd.arguments[0], cmd.arguments[1]);
                         std::cout << "Added files to sync\n";
-                        std::string masterPath = cmd.arguments[0];
-                        std::string slavePath = cmd.arguments[1];
                     } else {
                         std::cout << "ERROR: 'add' requires two arguments\n";
                     }
@@ -86,18 +86,46 @@ int main() {
                 }
                 case StringCode::remove: {
                     if (cmd.arguments.size() == 1) {
+                        fs.removeDirectories(cmd.arguments[0]);
                         std::cout << "Removed directory from sync\n";
-                        std::string path = cmd.arguments[0];
                     } else {
                         std::cout << "ERROR: 'remove' requires one argument\n";
                     }
+                    break;
+                }
+                case StringCode::list: {
+                    if (cmd.arguments.empty()) {
+                        // TODO: implement list command
+                        std::cout << "Directories for sync:\n";
+                        std::cout << "NOT IMPLEMENTED YET\n";
+                    } else {
+                        std::cout << "ERROR: 'list' does not accept arguments\n";
+                    }
+                    break;
+                }
+                case StringCode::clear: {
+                    if (cmd.arguments.empty()) {
+                        fs.clearAllDirectories();
+                        std::cout << "Cleared all directories\n";
+                    } else {
+                        std::cout << "ERROR: 'clear' does not accept arguments\n";
+                    }
+                    break;
+                }
+                case StringCode::exit: {
+                    if (cmd.arguments.empty()) {
+                        std::cout << "Exiting...\n";
+                        return 0;
+                    }
+                    std::cout << "ERROR: 'exit' does not accept arguments\n";
+                    break;
                 }
                 default:
-                    std::cout << "ERROR: incorrect command, try help\n";
+                    std::cout << "ERROR: incorrect command, try 'help' for list of commands\n";
             }
         }
         catch (std::exception& e) {
-            std::cout << e.what() << std::endl;
+            std::cout << "ERROR: " << e.what() << std::endl;
         }
     }
 }

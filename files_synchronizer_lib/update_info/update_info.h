@@ -12,10 +12,11 @@ private:
     WhoEnum newer;
     ModificationEvent modificationEvent;
 public:
+    UpdateInfo() = default;
     UpdateInfo(WhoEnum newer, ModificationEvent modificationEvent);
 
-    WhoEnum getNewer();
-    ModificationEvent getModificationEvent();
+    [[nodiscard]] WhoEnum getNewer() const;
+    [[nodiscard]] ModificationEvent getModificationEvent() const;
 };
 
 #endif //UPDATE_INFO_H

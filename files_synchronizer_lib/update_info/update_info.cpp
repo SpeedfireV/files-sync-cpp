@@ -6,10 +6,10 @@
 
 UpdateInfo::UpdateInfo(const WhoEnum newer, const ModificationEvent modificationEvent): newer(newer), modificationEvent(modificationEvent) {}
 
-WhoEnum UpdateInfo::getNewer() {
+[[nodiscard]] WhoEnum UpdateInfo::getNewer() const {
     return newer;
 }
 
-ModificationEvent UpdateInfo::getModificationEvent() {
+[[nodiscard]] ModificationEvent UpdateInfo::getModificationEvent() const {
     return modificationEvent;
 }
