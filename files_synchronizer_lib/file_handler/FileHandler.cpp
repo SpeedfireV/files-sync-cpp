@@ -37,6 +37,7 @@ FileHandler::FileHandler(std::string masterPath, std::string slavePath) {
 }
 
 std::vector<std::string> FileHandler::getFilesPathsInDirectory() const {
+    return {};
 }
 
 std::map<std::string, UpdateInfo> FileHandler::getDifferences() const {
@@ -48,11 +49,11 @@ std::map<std::string, UpdateInfo> FileHandler::getDifferences() const {
         time_t const& slaveModificationDate = slaveFiles[masterPath];
         time_t const& masterModificationDate = i->second;
         if (slaveFiles.contains(masterPath)) {
-            UpdateInfo updateInfo {
-                masterModificationDate >= slaveModificationDate ? Master : Slave,
-                masterModificationDate != slaveModificationDate ? Updated : None
-            };
-            differencesMap[masterPath] = updateInfo;
+            // UpdateInfo updateInfo {
+            //     masterModificationDate >= slaveModificationDate ? Master : Slave,
+            //     masterModificationDate != slaveModificationDate ? Updated : None
+            // };
+            // differencesMap[masterPath] = updateInfo;
         }
     }
     return differencesMap;
@@ -64,6 +65,7 @@ void FileHandler::updateFiles() {
 }
 
 time_t FileHandler::getModificationDate() {
+    return 0;
 }
 
 void FileHandler::updateSyncFilesPaths() {
