@@ -19,6 +19,8 @@ private:
     SyncFile masterSyncFile;
     SyncFile slaveSyncFile;
 
+    std::string pathFromWhoEnum(WhoEnum who);
+
     void updateFile(std::string fileRelativePath, WhoEnum from) const;
     time_t fileModificationDate(std::string fileRelativePath, WhoEnum who) const;
     void readSyncFiles();

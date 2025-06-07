@@ -14,16 +14,22 @@
     return slavePath;
 }
 
+std::string const& FileHandler::pathFromWhoEnum(WhoEnum who) {
+    return who == Master ? masterPath : slavePath;
+}
+
 void FileHandler::updateFile(std::string fileRelativePath, WhoEnum from) const {
+    std::filesystem::copy_file(pathFromWhoEnum(from));
 }
 
 time_t FileHandler::fileModificationDate(std::string fileRelativePath, WhoEnum who) const {
-    std::string absolutePath = (who == WhoEnum::Master ? masterPath : slavePath) + fileRelativePath;
+    std::string absolutePath = pathFromWhoEnum(who) + fileRelativePath;
     time_t modificationDate = std::filesystem::last_write_time(absolutePath).time_since_epoch().count();
     return modificationDate;
 }
 
 void FileHandler::readSyncFiles() {
+
 }
 
 FileHandler::~FileHandler() {

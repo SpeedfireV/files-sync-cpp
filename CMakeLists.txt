@@ -18,5 +18,5 @@ add_executable(PROI_PROJEKT main.cpp
         files_synchronizer_lib/who_enum/who_enum.h
         main.cpp
         main.cpp)
-#
-#add_subdirectory(google_test)
+
+add_subdirectory(google_test)
