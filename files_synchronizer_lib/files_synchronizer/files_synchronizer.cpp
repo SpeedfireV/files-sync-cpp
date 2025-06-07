@@ -67,7 +67,7 @@ std::map<FileHandler, time_t> FilesSynchronizer::lastSyncs() {
     std::map<FileHandler, time_t> lastSyncs;
     for (FileHandler& fh : dirsForSync) {
         // lastSyncs[fh] = fh.lastSync();
-        lastSyncs[fh] = 0; // Placeholder, implement actual logic
+        // lastSyncs[fh] = 0; // Placeholder, implement actual logic
     }
     return lastSyncs;
 }
