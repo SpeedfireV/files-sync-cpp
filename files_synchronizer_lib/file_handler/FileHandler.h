@@ -5,47 +5,40 @@
 #ifndef FILE_HANDLER_H
 #define FILE_HANDLER_H
 #include <string>
-#include <vector>
+#include <map>
 
 #include "../sync_file/SyncFile.h"
 #include "../who_enum/who_enum.h"
+#include "../update_info/update_info.h"
 
 
 class FileHandler {
 private:
-    time_t modificationDate; // now
-    std::string masterPath;
-    std::string slavePath;
-    SyncFile masterSyncFile;
-    SyncFile slaveSyncFile;
+    time_t modificationDate; // last sync time
+    std::string masterPath; // absolute path to master
+    std::string slavePath; // absolute path to slave
+    SyncFile syncFile; // sync file
+    std::map<std::string, UpdateInfo> updates;
 
-    const std::string& pathFromWhoEnum(WhoEnum who);
+    [[nodiscard]] const std::string& pathFromWhoEnum(WhoEnum who) const;
 
-    void updateFile(const std::string& fileRelativePath, WhoEnum from);
-    time_t fileModificationDate(const std::string& fileRelativePath, WhoEnum who);
+    void updateFile(const std::string& fileRelativePath, UpdateInfo updateInfo);
+    time_t fileModificationDate(const std::string& fileRelativePath, WhoEnum who) const;
     void readSyncFiles();
-    std::vector<std::string> getDirectoriesPaths(WhoEnum who);
 
 public:
-    ~FileHandler(); // Delete all json files
+    ~FileHandler() = default; // Save all JSON files
 
-    FileHandler(const std::string& masterPath, const std::string& slavePath);
+    FileHandler(const std::string& masterPath, const std::string& slavePath); // init with master and slave
 
-    [[nodiscard]] const std::string& getMasterPath() const;
-    [[nodiscard]] const std::string& getSlavePath() const;
+    [[nodiscard]] const std::string& getMasterPath() const; // returns an absolute path to master
+    [[nodiscard]] const std::string& getSlavePath() const; // returns an absolute path to slave
 
-    std::vector<std::string> getFilesPathsInDirectory(WhoEnum who);
+    std::map<std::string, time_t> getFilesPathsInDirectory(WhoEnum who) const; // returns all files in the directory
 
-    [[nodiscard]] std::map<std::string, UpdateInfo> getDifferences() const;
+    void getDifferences(); // returns differences
 
-    void updateFiles();
-
-    time_t getModificationDate();
-
-    void updateSyncFilesPaths();
-
-    void deleteSyncFiles(); // Basically destructor
-
+    void updateAllFiles(); // updates all files in the directory
 };
 
 

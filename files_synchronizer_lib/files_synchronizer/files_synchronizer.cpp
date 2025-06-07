@@ -6,8 +6,8 @@
 #include "../file_handler/FileHandler.h"
 #include <iostream>
 
-FilesSynchronizer::FilesSynchronizer(std::string const &masterPath, std::string const &slavePath) {
-    addDirectories(masterPath, slavePath);
+FilesSynchronizer::FilesSynchronizer() {
+    SyncFile::init();
 }
 
 void FilesSynchronizer::addDirectories(std::string const &masterPath, std::string const &slavePath) {
@@ -48,14 +48,25 @@ FileHandler& FilesSynchronizer::getFileHandler(std::string const& path) {
     throw std::runtime_error("No file handlers with specified path");
 }
 
+void FilesSynchronizer::prepareSyncFiles(std::string const &path) {
+    FileHandler& fh = getFileHandler(path);
+    fh.getDifferences();
+}
+
+void FilesSynchronizer::prepareAllSyncFiles() {
+    for (FileHandler& fh : dirsForSync) {
+        fh.getDifferences();
+    }
+}
+
 void FilesSynchronizer::syncDirectories(std::string const &path) {
     FileHandler& fh = getFileHandler(path);
-    fh.updateFiles();
+    fh.updateAllFiles();
 }
 
 void FilesSynchronizer::syncAllDirectories() {
     for (FileHandler& fh : dirsForSync) {
-        fh.updateFiles();
+        fh.updateAllFiles();
     }
 }
 time_t FilesSynchronizer::lastSyncs(std::string const& path) {
@@ -70,4 +81,8 @@ std::map<FileHandler, time_t> FilesSynchronizer::lastSyncs() {
         // lastSyncs[fh] = 0; // Placeholder, implement actual logic
     }
     return lastSyncs;
+}
+
+FileHandler& FilesSynchronizer::operator[](const size_t& index) {
+    return dirsForSync[index];
 }

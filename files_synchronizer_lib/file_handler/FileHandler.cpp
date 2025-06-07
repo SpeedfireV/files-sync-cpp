@@ -8,10 +8,39 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "../update_info/update_info.h"
+#include <algorithm>
+#include <direct.h>
 
-const std::string& FileHandler::pathFromWhoEnum(const WhoEnum who) {
+#include "../update_info/update_info.h"
+#include "../sync_file/SyncFile.h"
+
+[[nodiscard]] const std::string& FileHandler::pathFromWhoEnum(const WhoEnum who) const {
     return who == Master ? masterPath : slavePath;
+}
+
+void FileHandler::updateFile(const std::string &fileRelativePath, UpdateInfo updateInfo) {
+    std::string fromPath = pathFromWhoEnum(updateInfo.getNewer()) + fileRelativePath;
+    std::string toPath =  pathFromWhoEnum(updateInfo.getNewer() == Master ? Slave : Master) + fileRelativePath;
+    if (updateInfo.getModificationEvent() == Removed && exists(std::filesystem::path(toPath))) {
+        std::filesystem::remove(toPath);
+    }
+    else if (updateInfo.getModificationEvent() != None) {
+        std::filesystem::copy(fromPath, toPath,std::filesystem::copy_options::overwrite_existing);
+    }
+}
+
+void FileHandler::updateAllFiles() {
+    for (auto file : updates) {
+        updateFile(file.first, file.second);
+    }
+    auto filesMap = getFilesPathsInDirectory(Master);
+    std::vector<std::string> files = {};
+    for (auto it = filesMap.begin(); it != filesMap.end(); ++it)
+    {
+        // Add the key to the vector
+        files.push_back(it->first);
+    }
+    syncFile.changeJsonContents(masterPath, modificationDate, files);
 }
 
 [[nodiscard]] const std::string& FileHandler::getMasterPath() const {
@@ -22,82 +51,78 @@ const std::string& FileHandler::pathFromWhoEnum(const WhoEnum who) {
     return slavePath;
 }
 
-void FileHandler::updateFile(const std::string& fileRelativePath, const WhoEnum from) {
-    std::filesystem::copy_file(pathFromWhoEnum(from) + fileRelativePath, pathFromWhoEnum(from == Master ? Slave : Master) + fileRelativePath);
+time_t FileHandler::fileModificationDate(const std::string& fileRelativePath, const WhoEnum who) const {
+    const std::string absolutePath = pathFromWhoEnum(who) + "/" + fileRelativePath;
+    const auto ftime = std::filesystem::last_write_time(absolutePath);
+    const auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
+        ftime - std::filesystem::file_time_type::clock::now()
+        + std::chrono::system_clock::now()
+    );
+    return std::chrono::system_clock::to_time_t(sctp);
 }
 
-time_t FileHandler::fileModificationDate(const std::string& fileRelativePath, const WhoEnum who) {
-    std::string absolutePath = pathFromWhoEnum(who) + fileRelativePath;
-    time_t modificationDate = std::filesystem::last_write_time(absolutePath).time_since_epoch().count();
-    return modificationDate;
+FileHandler::FileHandler(const std::string& masterPath, const std::string& slavePath)
+    : masterPath(masterPath)
+    , slavePath(slavePath)
+    , syncFile(SyncFile::getSyncFile(masterPath, slavePath))
+    , modificationDate(0) {
+    auto filesMap = getFilesPathsInDirectory(Master);
+    std::vector<std::string> files {};
+    for (auto it = filesMap.begin(); it != filesMap.end(); ++it)
+    {
+        // Add the key to the vector
+        files.push_back(it->first);
+    }
+    auto syncFile = SyncFile(masterPath, slavePath, time_t(), files);
 }
 
-void FileHandler::readSyncFiles() {
-
-}
-
-std::vector<std::string> FileHandler::getDirectoriesPaths(const WhoEnum who) {
-    std::vector<std::string> dirs = {};
-    for (auto const& dir_entry : std::filesystem::recursive_directory_iterator(pathFromWhoEnum(who)))
-        if (dir_entry.is_directory()) {
-            dirs.push_back(dir_entry.path().string());
+std::map<std::string, time_t> FileHandler::getFilesPathsInDirectory(const WhoEnum who) const {
+    std::map<std::string, time_t> filePaths = {};
+    std::string directoryPath = pathFromWhoEnum(who);
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(directoryPath)) {
+        if (entry.is_regular_file()) {
+            auto relativePath = std::filesystem::relative(entry.path(), directoryPath);
+            filePaths[relativePath.string()] = fileModificationDate(relativePath.string(), who);
         }
-    return dirs;
-}
-
-// TODO: implement or delete destructor
-FileHandler::~FileHandler() = default;
-
-FileHandler::FileHandler(const std::string& masterPath, const std::string& slavePath) {
-    FileHandler::masterPath = masterPath;
-    FileHandler::slavePath = slavePath;
-    masterSyncFile = SyncFile();
-    slaveSyncFile = SyncFile();
-    // TODO: should this be 0?
-    modificationDate = 0;
-}
-
-std::vector<std::string> FileHandler::getFilesPathsInDirectory(const WhoEnum who) {
-    std::vector<std::string> filePaths = {};
-    for (auto const& dir_entry : std::filesystem::recursive_directory_iterator(pathFromWhoEnum(who)))
-        if (dir_entry.is_regular_file()) {
-            filePaths.push_back(dir_entry.path().string());
-        }
+    }
     return filePaths;
 }
 
-std::map<std::string, UpdateInfo> FileHandler::getDifferences() const {
-    auto masterFiles = masterSyncFile.getFilesSynchronizationDates();
-    auto slaveFiles = slaveSyncFile.getFilesSynchronizationDates();
+void FileHandler::getDifferences() {
+    const auto oldFiles = syncFile.getFiles();
+    const auto masterFiles = getFilesPathsInDirectory(WhoEnum::Master);
+    const auto slaveFiles = getFilesPathsInDirectory(WhoEnum::Slave);
     std::map<std::string, UpdateInfo> differencesMap = {};
-    for (auto & masterFile : masterFiles) {
-        std::string const& masterPath = masterFile.first;
-        time_t const& slaveModificationDate = slaveFiles[masterPath];
-        time_t const& masterModificationDate = masterFile.second;
-        if (slaveFiles.contains(masterPath)) {
-            // TODO: this does not compile, diagnose why
-            const UpdateInfo updateInfo (
-                masterModificationDate >= slaveModificationDate ? Master : Slave,
-                masterModificationDate != slaveModificationDate ? Updated : None
-            );
-            slaveFiles.erase(masterPath);
-            differencesMap[masterPath] = updateInfo;
+    for (auto & filePath : oldFiles) {
+        time_t masterModificationDate = 0;
+        if (masterFiles.contains(filePath)) {masterModificationDate = masterFiles.at(filePath);}
+        time_t slaveModificationDate = 0;
+        if (slaveFiles.contains(filePath)) {slaveModificationDate = slaveFiles.at(filePath);}
+
+        if (masterModificationDate == 0 and slaveModificationDate <= modificationDate) {
+            differencesMap[filePath] = UpdateInfo(WhoEnum::Master, ModificationEvent::Removed);
+        } else if (masterModificationDate <= modificationDate and slaveModificationDate == 0) {
+            differencesMap[filePath] = UpdateInfo(WhoEnum::Slave, ModificationEvent::Removed);
+        } else if (masterModificationDate >= slaveModificationDate) {
+            differencesMap[filePath] = UpdateInfo(WhoEnum::Master, ModificationEvent::Updated);
+        } else if (masterModificationDate < slaveModificationDate) {
+            differencesMap[filePath] = UpdateInfo(WhoEnum::Slave, ModificationEvent::Updated);
         }
     }
-    // TODO: Add remaining changes from slave files to differences map
-    return differencesMap;
-}
-
-void FileHandler::updateFiles() {
-
-}
-
-time_t FileHandler::getModificationDate() {
-    return 0;
-}
-
-void FileHandler::updateSyncFilesPaths() {
-}
-
-void FileHandler::deleteSyncFiles() {
+    std::map<std::string, time_t> newFiles = {};
+    for (auto & file : masterFiles) {
+        if (std::find(oldFiles.begin(), oldFiles.end(), file.first) == oldFiles.end()) {
+            newFiles[file.first] = file.second;
+        }
+    }
+    for (auto & file : slaveFiles) {
+        if (std::find(oldFiles.begin(), oldFiles.end(), file.first) != oldFiles.end()) {
+            continue;
+        } if (newFiles.contains(file.first) and newFiles.at(file.first) > file.second) {
+            differencesMap[file.first] = UpdateInfo(WhoEnum::Master, ModificationEvent::Created);
+        } else {
+            differencesMap[file.first] = UpdateInfo(WhoEnum::Slave, ModificationEvent::Created);
+        }
+    }
+    this->updates = differencesMap;
 }

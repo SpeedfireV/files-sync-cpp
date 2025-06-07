@@ -13,8 +13,7 @@ class FilesSynchronizer {
 private:
     std::vector<FileHandler> dirsForSync = std::vector<FileHandler>();
 public:
-    FilesSynchronizer() = default;
-    FilesSynchronizer(std::string const& masterPath, std::string const& slavePath);
+    FilesSynchronizer();
 
     void addDirectories(std::string const& masterPath, std::string const& slavePath);
 
@@ -23,11 +22,16 @@ public:
 
     FileHandler& getFileHandler(std::string const& path);
 
+    void prepareSyncFiles(std::string const& path);
+    void prepareAllSyncFiles();
+
     void syncDirectories(std::string const& path); // Path might be master or slave
     void syncAllDirectories();
 
     time_t lastSyncs(std::string const& path) ; // Path might be master or slave
     std::map<FileHandler, time_t> lastSyncs();
+
+    FileHandler& operator[](const size_t& index);
 };
 
 

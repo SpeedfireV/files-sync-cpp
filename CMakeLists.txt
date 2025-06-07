@@ -3,6 +3,9 @@ project(PROI_PROJEKT)
 
 set(CMAKE_CXX_STANDARD 20)
 
+include(FetchContent)
+
+
 add_executable(PROI_PROJEKT main.cpp
         files_synchronizer_lib/files_synchronizer/files_synchronizer.cpp
         files_synchronizer_lib/files_synchronizer/files_synchronizer.h
@@ -18,5 +21,7 @@ add_executable(PROI_PROJEKT main.cpp
         files_synchronizer_lib/who_enum/who_enum.h)
 
 add_executable(MAIN main.cpp)
+
+add_executable(JSON_test json_test.cpp)
 
 add_subdirectory(google_test)

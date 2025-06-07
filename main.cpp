@@ -119,7 +119,7 @@ int main() {
                     }
                     std::cout << "ERROR: 'exit' does not accept arguments\n";
                     break;
-                }
+               }
                 default:
                     std::cout << "ERROR: incorrect command, try 'help' for list of commands\n";
             }
