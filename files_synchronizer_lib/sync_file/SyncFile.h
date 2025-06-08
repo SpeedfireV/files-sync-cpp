@@ -34,7 +34,7 @@ public:
     void setModificationDate(time_t modificationDate);
     void setFiles(std::vector<std::string> files);
 
-    static void init();
+    static std::vector<SyncFile> init();
 };
 
 

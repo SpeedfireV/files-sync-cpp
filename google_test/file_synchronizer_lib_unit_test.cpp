@@ -103,8 +103,8 @@ TEST_F(FilesSynchronizerTest, SyncDirectories) {
     FilesSynchronizer sync("test_master", "test_slave");
     
     // Synchronizacja istniejących katalogów
-    EXPECT_NO_THROW(sync.syncDirectories("test_master"));
+    EXPECT_NO_THROW(sync.syncFiles("test_master"));
     
     // Próba synchronizacji nieistniejącego katalogu
-    EXPECT_THROW(sync.syncDirectories("nonexistent"), std::runtime_error);
+    EXPECT_THROW(sync.syncFiles("nonexistent"), std::runtime_error);
 }

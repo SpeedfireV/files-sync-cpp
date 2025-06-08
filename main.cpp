@@ -17,7 +17,8 @@ enum class StringCode {
     remove,
     list,
     clear,
-    exit
+    exit,
+    syncAll  // <-- Added syncAll
 };
 
 StringCode stringToCode(std::string const& str) {
@@ -27,8 +28,21 @@ StringCode stringToCode(std::string const& str) {
     if (str == "list") return StringCode::list;
     if (str == "clear") return StringCode::clear;
     if (str == "exit") return StringCode::exit;
+    if (str == "syncAll") return StringCode::syncAll;  // <-- Added syncAll
     return StringCode::none;
 }
+
+void printHelp() {
+    std::cout << "Available commands:" << std::endl;
+    std::cout << "  help - prints this message" << std::endl;
+    std::cout << "  add <master_path> <slave_path> - adds two files to synchronize" << std::endl;
+    std::cout << "  remove <path> - removes directory from synchronization" << std::endl;
+    std::cout << "  list - lists all directories for synchronization" << std::endl;
+    std::cout << "  clear - clears all directories for synchronization" << std::endl;
+    std::cout << "  syncAll - synchronizes all registered files" << std::endl;  // <-- Added line
+    std::cout << "  exit - exits the program" << std::endl;
+}
+
 
 Command parseCommand(const std::string& input) {
     std::istringstream iss(input);
@@ -40,18 +54,8 @@ Command parseCommand(const std::string& input) {
     while (iss >> std::quoted(arg)) {
         cmd.arguments.push_back(arg);
     }
-    
-    return cmd;
-}
 
-void printHelp() {
-    std::cout << "Available commands:" << std::endl;
-    std::cout << "  help - prints this message" << std::endl;
-    std::cout << "  add <master_path> <slave_path> - adds two files to synchronize" << std::endl;
-    std::cout << "  remove <path> - removes directory from synchronization" << std::endl;
-    std::cout << "  list - lists all directories for synchronization" << std::endl;
-    std::cout << "  clear - clears all directories for synchronization" << std::endl;
-    std::cout << "  exit - exits the program" << std::endl;
+    return cmd;
 }
 
 int main() {
@@ -81,6 +85,15 @@ int main() {
                         std::cout << "Added files to sync\n";
                     } else {
                         std::cout << "ERROR: 'add' requires two arguments\n";
+                    }
+                    break;
+                }
+                case StringCode::syncAll: {
+                    if (cmd.arguments.empty()) {
+                        fs.syncAllFiles();
+                        std::cout << "Synchronization complete\n";
+                    } else {
+                        std::cout << "ERROR: 'syncAll' does not accept arguments\n";
                     }
                     break;
                 }

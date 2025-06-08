@@ -110,7 +110,7 @@ void SyncFile::addPair(const std::string &masterPath, const std::string &slavePa
     auto currentFile = fromJson();
     for (auto file: currentFile) {
         if (file.masterPath == masterPath && file.slavePath == slavePath) {
-            throw std::runtime_error("Pair already exists");
+            return;
         }
     }
     toJson(SyncFile(masterPath, slavePath, time_t(0), std::vector<std::string>()));
@@ -154,7 +154,7 @@ void SyncFile::setFiles(std::vector<std::string> files) {
     this->files = files;
 }
 
-void SyncFile::init() {
+std::vector<SyncFile> SyncFile::init() {
 
     if (!exists(std::filesystem::path(std::filesystem::current_path().string() + "/sync_file.json"))) {
         json output;
@@ -167,4 +167,8 @@ void SyncFile::init() {
         outFile << output.dump(4);  // Pretty-print with indentation
         outFile.close();
     }
+
+    std::vector<SyncFile> syncFiles = fromJson();
+    return syncFiles;
+
 }

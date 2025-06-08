@@ -9,8 +9,8 @@ include(FetchContent)
 add_executable(PROI_PROJEKT main.cpp
         files_synchronizer_lib/files_synchronizer/files_synchronizer.cpp
         files_synchronizer_lib/files_synchronizer/files_synchronizer.h
-        files_synchronizer_lib/file_handler/FileHandler.cpp
-        files_synchronizer_lib/file_handler/FileHandler.h
+        files_synchronizer_lib/file_handler/FilesHandler.cpp
+        files_synchronizer_lib/file_handler/FilesHandler.h
         files_synchronizer_lib/sync_file/SyncFile.cpp
         files_synchronizer_lib/sync_file/SyncFile.h
         files_synchronizer_lib/modification_event/ModificationEvent.cpp

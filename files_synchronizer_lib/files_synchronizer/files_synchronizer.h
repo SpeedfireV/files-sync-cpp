@@ -7,11 +7,12 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "../file_handler/FileHandler.h"
+#include "../file_handler/FilesHandler.h"
 
 class FilesSynchronizer {
 private:
-    std::vector<FileHandler> dirsForSync = std::vector<FileHandler>();
+    FilesHandler filesHandler = FilesHandler();
+    std::vector<std::string> dirsForSync = {};
 public:
     FilesSynchronizer();
 
@@ -20,18 +21,16 @@ public:
     void removeDirectories(std::string const& path); // Path might be master or slave
     void clearAllDirectories();
 
-    FileHandler& getFileHandler(std::string const& path);
+    FilesHandler& getFileHandler(std::string const& path);
 
-    void prepareSyncFiles(std::string const& path);
-    void prepareAllSyncFiles();
+    // void prepareSyncFiles(std::string const& path);
+    // void prepareAllSyncFiles();
 
-    void syncDirectories(std::string const& path); // Path might be master or slave
-    void syncAllDirectories();
-
-    time_t lastSyncs(std::string const& path) ; // Path might be master or slave
-    std::map<FileHandler, time_t> lastSyncs();
-
-    FileHandler& operator[](const size_t& index);
+    void syncFiles(std::string const& path); // Path might be master or slave
+    void syncAllFiles();
+    //
+    // time_t lastSyncs(std::string const& path) ; // Path might be master or slave
+    // std::map<FilesHandler, time_t> lastSyncs();
 };
 
 
