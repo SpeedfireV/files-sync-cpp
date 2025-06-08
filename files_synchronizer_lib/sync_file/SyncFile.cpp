@@ -17,9 +17,9 @@ SyncFile::SyncFile(std::string masterPath, std::string slavePath, time_t modific
     SyncFile::files = files;
 }
 
-void SyncFile::toJson(SyncFile const& syncFile, const std::string& absolutePath) {
+void SyncFile::toJson(SyncFile const& syncFile) {
     // Step 1: Read the current JSON into memory
-    std::vector<SyncFile> currentPairs = fromJson(absolutePath);
+    std::vector<SyncFile> currentPairs = fromJson();
 
     // Step 2: Update or add the syncFile
     bool updated = false;
@@ -50,9 +50,10 @@ void SyncFile::toJson(SyncFile const& syncFile, const std::string& absolutePath)
     }
 
     // Step 4: Write to file
-    std::ofstream outFile(absolutePath);
+    std::string outPath = std::filesystem::current_path().string() + "/sync_file.json";
+    std::ofstream outFile(outPath);
     if (!outFile.is_open()) {
-        throw std::runtime_error("Failed to open output file: " + absolutePath);
+        throw std::runtime_error("Failed to open output file: " + outPath);
     }
     std::cout << output.dump(4);
     outFile << output.dump(4);  // Pretty-print with indentation
@@ -60,7 +61,7 @@ void SyncFile::toJson(SyncFile const& syncFile, const std::string& absolutePath)
 }
 
 
-std::vector<SyncFile> SyncFile::fromJson(const std::string& absolutePath) {
+std::vector<SyncFile> SyncFile::fromJson() {
     std::ifstream JsonFile(std::filesystem::current_path().string() + "/sync_file.json");
     if (!JsonFile.is_open()) {
         throw std::runtime_error("Could not open JSON file.");
@@ -88,7 +89,7 @@ std::vector<SyncFile> SyncFile::fromJson(const std::string& absolutePath) {
 }
 
 SyncFile SyncFile::getSyncFile(std::string masterPath, const std::string& slavePath) {
-    auto pairs = fromJson(masterPath);
+    auto pairs = fromJson();
     for (auto pair: pairs) {
         if (pair.masterPath == masterPath) {
             return pair;
@@ -105,6 +106,17 @@ const std::vector<std::string>& SyncFile::getFiles() const {
     return files;
 }
 
+void SyncFile::addPair(const std::string &masterPath, const std::string &slavePath) {
+    auto currentFile = fromJson();
+    for (auto file: currentFile) {
+        if (file.masterPath == masterPath && file.slavePath == slavePath) {
+            throw std::runtime_error("Pair already exists");
+        }
+    }
+    toJson(SyncFile(masterPath, slavePath, time_t(0), std::vector<std::string>()));
+}
+
+
 std::string& SyncFile::getMasterPath() {
     return masterPath;
 }
@@ -119,12 +131,12 @@ time_t SyncFile::getModificationDate() {
 
 void SyncFile::changeJsonContents(const std::string &masterPath,
     const time_t &modificationDate, const std::vector<std::string> &files) {
-    std::vector<SyncFile> syncFiles = fromJson(std::filesystem::current_path().string());
+    std::vector<SyncFile> syncFiles = fromJson();
     for (auto& syncFile: syncFiles) {
         if (syncFile.getMasterPath() == masterPath) {
             syncFile.setModificationDate(modificationDate);
             syncFile.setFiles(files);
-            toJson(syncFile, std::filesystem::current_path().string());
+            toJson(syncFile);
             return;
 
         }

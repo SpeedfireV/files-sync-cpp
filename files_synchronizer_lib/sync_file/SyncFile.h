@@ -19,8 +19,8 @@ private:
 public:
     SyncFile(std::string masterPath, std::string slavePath, time_t modificationDate, std::vector<std::string> files);
 
-    static void toJson(SyncFile const& syncFile, const std::string&); // Save data from that class
-    static std::vector<SyncFile> fromJson(const std::string&);
+    static void toJson(SyncFile const& syncFile); // Save data from that class
+    static std::vector<SyncFile> fromJson();
 
     static SyncFile getSyncFile(std::string masterPath, const std::string& slavePath);
 
@@ -30,6 +30,7 @@ public:
     void changeJsonContents(const std::string &masterPath,
         const time_t &modificationDate, const std::vector<std::string> &files);
     const std::vector<std::string>& getFiles() const;
+    static void addPair(const std::string &masterPath, const std::string& slavePath);
     void setModificationDate(time_t modificationDate);
     void setFiles(std::vector<std::string> files);
 

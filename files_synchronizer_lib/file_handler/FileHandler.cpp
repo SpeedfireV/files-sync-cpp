@@ -66,6 +66,7 @@ FileHandler::FileHandler(const std::string& masterPath, const std::string& slave
     , masterPath(masterPath)
     , slavePath(slavePath)
     , syncFile(SyncFile::getSyncFile(masterPath, slavePath)) {
+    SyncFile::addPair(masterPath, slavePath);
     auto filesMap = getFilesPathsInDirectory(Master);
     std::vector<std::string> files {};
     for (auto it = filesMap.begin(); it != filesMap.end(); ++it)
