@@ -62,10 +62,10 @@ time_t FileHandler::fileModificationDate(const std::string& fileRelativePath, co
 }
 
 FileHandler::FileHandler(const std::string& masterPath, const std::string& slavePath)
-    : masterPath(masterPath)
+    : modificationDate(0)
+    , masterPath(masterPath)
     , slavePath(slavePath)
-    , syncFile(SyncFile::getSyncFile(masterPath, slavePath))
-    , modificationDate(0) {
+    , syncFile(SyncFile::getSyncFile(masterPath, slavePath)) {
     auto filesMap = getFilesPathsInDirectory(Master);
     std::vector<std::string> files {};
     for (auto it = filesMap.begin(); it != filesMap.end(); ++it)

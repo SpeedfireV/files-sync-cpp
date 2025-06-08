@@ -1,0 +1,48 @@
+{
+    "pairs": [
+        {
+            "masterPath12": {
+                "date": 1656432000,
+                "files": [
+                    "plik1.txt",
+                    "plik2.txt",
+                    "plik3.txt"
+                ],
+                "slavePath": "123"
+            }
+        },
+        {
+            "masterPath0": {
+                "date": 1,
+                "files": [
+                    "plik15235252321.txt",
+                    "plik125151252.txt",
+                    "plik1251521253.txt"
+                ],
+                "slavePath": "123"
+            }
+        },
+        {
+            "masterPath1": {
+                "date": 1,
+                "files": [
+                    "plik153252.txt",
+                    "plik2.txt",
+                    "plik3.txt"
+                ],
+                "slavePath": "123"
+            }
+        },
+        {
+            "masterPath525": {
+                "date": 1,
+                "files": [
+                    "plik1.txt",
+                    "plik2.txt",
+                    "plik3.txt"
+                ],
+                "slavePath": "1234567"
+            }
+        }
+    ]
+}
