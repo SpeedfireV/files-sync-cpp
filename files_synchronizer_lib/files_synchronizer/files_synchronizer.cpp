@@ -27,7 +27,6 @@ void FilesSynchronizer::removeDirectories(std::string const &path) {
     auto it = dirsForSync.begin();
     while (it != dirsForSync.end()) {
         if (*it == path) {
-            std::cout << "Removed directory" << std::endl;
             dirsForSync.erase(it);
             return;
         }
@@ -42,6 +41,10 @@ void FilesSynchronizer::clearAllDirectories() {
 
 FilesHandler& FilesSynchronizer::getFileHandler(std::string const& path) {
     return filesHandler;
+}
+
+const std::vector<std::string> & FilesSynchronizer::getDirectories() const {
+    return dirsForSync;
 }
 
 

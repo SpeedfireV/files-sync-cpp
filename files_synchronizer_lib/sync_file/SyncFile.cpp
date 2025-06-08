@@ -26,7 +26,6 @@ void SyncFile::toJson(SyncFile const& syncFile) {
     for (auto& pair : currentPairs) {
         if (pair.masterPath == syncFile.masterPath) {
             pair = syncFile;
-            std::cout << pair.modificationDate;
             updated = true;
             break;
         }
@@ -55,7 +54,6 @@ void SyncFile::toJson(SyncFile const& syncFile) {
     if (!outFile.is_open()) {
         throw std::runtime_error("Failed to open output file: " + outPath);
     }
-    std::cout << output.dump(4);
     outFile << output.dump(4);  // Pretty-print with indentation
     outFile.close();
 }
@@ -146,7 +144,6 @@ void SyncFile::changeJsonContents(const std::string &masterPath,
 
 
 void SyncFile::setModificationDate(time_t modificationDate) {
-    std::cout << modificationDate;
     SyncFile::modificationDate = modificationDate;
 }
 
@@ -163,7 +160,6 @@ std::vector<SyncFile> SyncFile::init() {
         if (!outFile.is_open()) {
             throw std::runtime_error("Failed to open output file: " + std::filesystem::current_path().string() + "/sync_file.json");
         }
-        std::cout << output.dump(4);
         outFile << output.dump(4);  // Pretty-print with indentation
         outFile.close();
     }

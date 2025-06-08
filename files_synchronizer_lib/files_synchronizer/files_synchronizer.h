@@ -22,6 +22,7 @@ public:
     void clearAllDirectories();
 
     FilesHandler& getFileHandler(std::string const& path);
+    const std::vector<std::string>& getDirectories() const;
 
     // void prepareSyncFiles(std::string const& path);
     // void prepareAllSyncFiles();

@@ -20,28 +20,28 @@
 }
 
 void FilesHandler::updateFile(SyncFile syncFile, const std::string &fileRelativePath, UpdateInfo updateInfo) {
-    std::cout << "UPDATE FILE!" << std::endl;
-    std::string fromPath = pathFromWhoEnum(syncFile, updateInfo.getNewer()) + fileRelativePath;
-    std::string toPath =  pathFromWhoEnum(syncFile, updateInfo.getNewer() == Master ? Slave : Master) + fileRelativePath;
+    std::string fromPath = pathFromWhoEnum(syncFile, updateInfo.getNewer()) + '/' + fileRelativePath;
+    std::string toPath =  pathFromWhoEnum(syncFile, updateInfo.getNewer() == Master ? Slave : Master) + '/' + fileRelativePath;
     if (updateInfo.getModificationEvent() == Removed && exists(std::filesystem::path(toPath))) {
         std::filesystem::remove(toPath);
     }
     else if (updateInfo.getModificationEvent() != None) {
-        std::filesystem::copy(fromPath, toPath,std::filesystem::copy_options::overwrite_existing);
+        if (std::filesystem::exists(toPath)) {
+            std::filesystem::remove(toPath);
+        }
+        std::filesystem::copy(fromPath, toPath, std::filesystem::copy_options::overwrite_existing);
     }
 }
 
 void FilesHandler::updateAllFiles() {
     std::vector<SyncFile> syncFiles = SyncFile::fromJson();
     for (auto syncFile: syncFiles) {
-        std::cout << syncFile.getMasterPath() << std::endl;
         auto updates = getDifferences(syncFile);
         std::vector<std::string> filesPaths = {};
-        for (auto it = updates.begin(); it != updates.end(); ++it)
+        for (auto & update : updates)
         {
-            filesPaths.push_back(it->first);
-            std::cout << it->second.getModificationEvent() << " " << it->first << std::endl;
-            updateFile(syncFile, it->first, it->second);
+            filesPaths.push_back(update.first);
+            updateFile(syncFile, update.first, update.second);
         }
         auto filesMap = getFilesPathsInDirectory(syncFile, Master);
         syncFile.changeJsonContents(syncFile.getMasterPath(), syncFile.getModificationDate(), filesPaths);
@@ -88,13 +88,9 @@ std::map<std::string, time_t> FilesHandler::getFilesPathsInDirectory(SyncFile sy
 std::map<std::string, UpdateInfo> FilesHandler::getDifferences(SyncFile syncFile) {
     const auto oldFiles = syncFile.getFiles();
     const auto masterFiles = getFilesPathsInDirectory(syncFile, WhoEnum::Master);
-    for (auto it = masterFiles.begin(); it != masterFiles.end(); ++it)
-    {
-        std::cout << it->first << " THERE IS THAT FILE" << std::endl;
-    }
     const auto slaveFiles = getFilesPathsInDirectory(syncFile, WhoEnum::Slave);
     std::map<std::string, UpdateInfo> differencesMap = {};
-    for (auto & filePath : oldFiles) {
+    for (auto & filePath : oldFiles) { // find removed and modified files
         time_t masterModificationDate = 0;
         if (masterFiles.contains(filePath)) {masterModificationDate = masterFiles.at(filePath);}
         time_t slaveModificationDate = 0;
@@ -125,9 +121,10 @@ std::map<std::string, UpdateInfo> FilesHandler::getDifferences(SyncFile syncFile
             differencesMap[file.first] = UpdateInfo(WhoEnum::Slave, ModificationEvent::Created);
         }
     }
-    for (auto it = differencesMap.begin(); it != differencesMap.end(); ++it)
-    {
-        std::cout << it->first << " there's a difference";
+    for (auto & file : newFiles) {
+        if (std::find(oldFiles.begin(), oldFiles.end(), file.first) == oldFiles.end()) {
+            differencesMap[file.first] = UpdateInfo(WhoEnum::Master, ModificationEvent::Created);
+        }
     }
     this->updates = differencesMap;
     return differencesMap;

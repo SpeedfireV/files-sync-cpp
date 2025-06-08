@@ -110,7 +110,13 @@ int main() {
                     if (cmd.arguments.empty()) {
                         // TODO: implement list command
                         std::cout << "Directories for sync:\n";
-                        std::cout << "NOT IMPLEMENTED YET\n";
+                        if (fs.getDirectories().empty()) {
+                            std::cout << "    None\n";
+                            break;
+                        }
+                        for (auto directories = fs.getDirectories(); const auto& directory: directories) {
+                            std::cout << "    " << directory << "\n";
+                        }
                     } else {
                         std::cout << "ERROR: 'list' does not accept arguments\n";
                     }
