@@ -18,7 +18,9 @@ add_executable(PROI_PROJEKT main.cpp
         files_synchronizer_lib/update_info/update_info.cpp
         files_synchronizer_lib/update_info/update_info.h
         files_synchronizer_lib/who_enum/who_enum.cpp
-        files_synchronizer_lib/who_enum/who_enum.h)
+        files_synchronizer_lib/who_enum/who_enum.h
+        files_synchronizer_app/FilesSynchronizerApp.cpp
+        files_synchronizer_app/FilesSynchronizerApp.h)
 
 add_executable(MAIN main.cpp)
 
