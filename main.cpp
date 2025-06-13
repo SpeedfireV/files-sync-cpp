@@ -1,8 +1,7 @@
-#include "files_synchronizer_app/FilesSynchronizerApp.h"
+#include "FilesSynchronizerApp/FilesSynchronizerApp.h"
 
 
 int main() {
-    FilesSynchronizerApp app;
+    FilesSynchronizerApp app = FilesSynchronizerApp("C:\\Users\\Wojciech\\Documents\\GitHub\\Studia\\Inne\\FileSynchronizer\\SyncFile.json");
     app.run();
-    return 0;
 }
