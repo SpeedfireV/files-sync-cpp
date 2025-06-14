@@ -234,7 +234,12 @@ std::ostream & operator<<(std::ostream &os, const FilesHandler &fh) {
     const time_t time = fh.getLastSync();
     os << "Path1: " << fh.getPath1() << "\n";
     os << "Path2: " << fh.getPath2() << "\n";
-    os << "Last sync: " << std::put_time(localtime(&time), "%a %d %b %Y, %H:%M:%S") << "\n";
+    os << "Last sync: ";
+    if (time == 0) {
+        os << "Never\n";
+    } else {
+        os << std::put_time(localtime(&time), "%a %d %b %Y, %H:%M:%S") << "\n";
+    }
 
     return os;
 }

@@ -75,7 +75,7 @@ void FilesSynchronizerApp::help() const {
     std::cout << "  sync - syncs all entries" << std::endl;
     std::cout << "  conflicts <name> - prints conflicts in an entry" << std::endl;
     std::cout << "  conflicts - prints conflicts in all entries" << std::endl;
-    std::cout << "  resolve <name> <source> - resolves conflicts in an entry" << std::endl;
+    std::cout << "  resolve <name> <source> - resolves conflicts in an entry (prioritizes changes in directory 1/2)" << std::endl;
     std::cout << "  exit - exits the program" << std::endl;
 }
 
