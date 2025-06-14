@@ -116,6 +116,13 @@ void FilesSynchronizer::listAllConflicts() const {
     }
 }
 
+void FilesSynchronizer::resolveConflicts(const std::string &name, const ChangeSource source) {
+    if (!fileHandlers.contains(name)) {
+        throw std::runtime_error("Entry with name " + name + " does not exist");
+    }
+    fileHandlers.at(name).resolveConflicts(source);
+}
+
 void FilesSynchronizer::loadData() {
     fileHandlers = syncJSON.loadJSON();
 }

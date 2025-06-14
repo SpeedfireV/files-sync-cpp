@@ -35,3 +35,5 @@ int main() {
     time_test2();
     return 0;
 }
+
+// bardziej ważny siusiak

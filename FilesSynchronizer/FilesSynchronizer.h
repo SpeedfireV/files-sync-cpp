@@ -9,7 +9,7 @@
 class FilesSynchronizer {
 private:
     std::map<std::string, FilesHandler> fileHandlers; // all FilesHandler objects to synchronize
-    SyncJSON syncJSON; // An object for saving and loading JSON file
+    SyncJSON syncJSON; // An object for saving and loading a JSON file
 public:
     explicit FilesSynchronizer(const std::string& json_path); // Specify JSON file path at initialization
 
@@ -31,6 +31,8 @@ public:
 
     void listConflicts(const std::string& name) const;
     void listAllConflicts() const;
+
+    void resolveConflicts(const std::string& name, ChangeSource source);
 
     void loadData();
     void saveData() const;

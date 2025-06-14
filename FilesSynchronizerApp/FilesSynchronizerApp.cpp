@@ -34,10 +34,27 @@ void FilesSynchronizerApp::stringToCode(std::string const &str) {
     else if (str == "list") cmd = CommandCode::list;
     else if (str == "sync") cmd = CommandCode::sync;
     else if (str == "conflicts") cmd = CommandCode::conflicts;
+    else if (str == "resolve") cmd = CommandCode::resolve;
     else if (str == "exit") cmd = CommandCode::exit;
     else if (str == "yes") cmd = CommandCode::yes;
     else if (str == "no") cmd = CommandCode::no;
     else cmd = CommandCode::none;
+}
+
+bool FilesSynchronizerApp::areYouSure() {
+    std::cout << "Are you sure? (yes/no)\n";
+    while (true) {
+        getInput();
+        if (argc != 0 or (cmd != CommandCode::yes and cmd != CommandCode::no)) {
+            std::cout << "Invalid input, are you sure? (yes/no)\n";
+            continue;
+        }
+        if (cmd == CommandCode::yes) {
+            return true;
+        }
+        std::cout << "Aborted\n";
+        return false;
+    }
 }
 
 void FilesSynchronizerApp::help() const {
@@ -58,6 +75,7 @@ void FilesSynchronizerApp::help() const {
     std::cout << "  sync - syncs all entries" << std::endl;
     std::cout << "  conflicts <name> - prints conflicts in an entry" << std::endl;
     std::cout << "  conflicts - prints conflicts in all entries" << std::endl;
+    std::cout << "  resolve <name> <source> - resolves conflicts in an entry" << std::endl;
     std::cout << "  exit - exits the program" << std::endl;
 }
 
@@ -129,20 +147,8 @@ void FilesSynchronizerApp::sync() {
     if (argc != 0 && argc != 1) {
         throw std::runtime_error("'sync' accepts up to one argument");
     }
-    std::cout << "Are you sure? (yes/no)\n";
-    while (true) {
-        getInput();
-        if (argc != 0 or (cmd != CommandCode::yes and cmd != CommandCode::no)) {
-            std::cout << "Invalid input, are you sure? (yes/no)\n";
-            continue;
-        }
-        if (cmd == CommandCode::yes) {
-            break;
-        }
-        else {
-            std::cout << "Aborted\n";
-            return;
-        }
+    if (!areYouSure()) {
+        return;
     }
     if (argc == 1) {
         fs.syncEntry(argv[0]);
@@ -168,6 +174,22 @@ void FilesSynchronizerApp::conflicts() const {
     else {
         fs.listAllConflicts();
     }
+}
+
+void FilesSynchronizerApp::resolve() {
+    if (argc != 2) {
+        throw std::runtime_error("'resolve' requires two arguments");
+    }
+    const std::string &name = argv[0];
+    const std::string &source = argv[1];
+    if (source != "1" and source != "2") {
+        throw std::runtime_error("Invalid source, must be 1 or 2");
+    }
+    if (!areYouSure()) {
+        return;
+    }
+    fs.resolveConflicts(name, source == "1" ? ChangeSource::Path1 : ChangeSource::Path2);
+    std::cout << "Resolved conflicts\n";
 }
 
 void FilesSynchronizerApp::exit() const {
@@ -225,6 +247,10 @@ void FilesSynchronizerApp::run() {
                 }
                 case CommandCode::conflicts: {
                     conflicts();
+                    break;
+                }
+                case CommandCode::resolve: {
+                    resolve();
                     break;
                 }
                 case CommandCode::exit: {

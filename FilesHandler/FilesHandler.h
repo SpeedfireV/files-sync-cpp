@@ -14,12 +14,6 @@ private:
     std::vector<std::filesystem::path> files; // an entry tracking all files in the entry
     std::map<std::filesystem::path, UpdateData> updates; // Helper entry for tracking updates
 
-    void setLastSync(time_t last_sync); // Sets last sync time
-    void setPath1(const std::filesystem::path& path1); // Sets path1
-    void setPath2(const std::filesystem::path& path2); // Sets path2
-    void setFiles(const std::vector<std::filesystem::path>& files); // Sets files
-    void setUpdates(const std::map<std::filesystem::path, UpdateData>& updates); // Sets updates
-
     static time_t getModificationDate(const std::filesystem::path& path); // Returns modification date of the file
     void syncFile(const std::filesystem::path& path, const UpdateData& update_data) const; // Syncs file
 public:
@@ -38,6 +32,7 @@ public:
 
     static std::vector<std::filesystem::path> findFiles(const std::filesystem::path& path);
     void findUpdates(); // Searches for changes in the file system
+    void resolveConflicts(ChangeSource source); // Resolve conflicts
     void syncFiles(); // sync files
 };
 

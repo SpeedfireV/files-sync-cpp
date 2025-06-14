@@ -16,6 +16,7 @@ enum class CommandCode {
     list,
     sync,
     conflicts,
+    resolve,
     exit,
     yes,
     no
@@ -30,6 +31,7 @@ private:
 
     void getInput();
     void stringToCode(std::string const& str);
+    bool areYouSure();
 
     void help() const;
     void load();
@@ -40,6 +42,7 @@ private:
     void list() const;
     void sync();
     void conflicts() const;
+    void resolve();
     void exit() const;
 
 public:

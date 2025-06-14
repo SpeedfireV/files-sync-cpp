@@ -1,39 +1,8 @@
 #include "FilesHandler.h"
 
 #include <chrono>
+#include <iostream>
 #include <ranges>
-
-void FilesHandler::setLastSync(const time_t last_sync) {
-    this->last_sync = last_sync;
-}
-
-void FilesHandler::setPath1(const std::filesystem::path &path1) {
-    if (!std::filesystem::exists(path1)) {
-        throw std::runtime_error(path1.generic_string() + " does not exist");
-    }
-    if (!std::filesystem::is_directory(path1)) {
-        throw std::runtime_error(path1.generic_string() + " is not a directory");
-    }
-    this->path1 = std::filesystem::canonical(path1);
-}
-
-void FilesHandler::setPath2(const std::filesystem::path &path2) {
-    if (!std::filesystem::exists(path2)) {
-        throw std::runtime_error(path2.generic_string() + " does not exist");
-    }
-    if (!std::filesystem::is_directory(path2)) {
-        throw std::runtime_error(path2.generic_string() + " is not a directory");
-    }
-    this->path2 = std::filesystem::canonical(path2);
-}
-
-void FilesHandler::setFiles(const std::vector<std::filesystem::path> &files) {
-    this->files = files; // I trust these files to be correct
-}
-
-void FilesHandler::setUpdates(const std::map<std::filesystem::path, UpdateData> &updates) {
-    this->updates = updates; // Here I also trust everything to be correct
-}
 
 time_t FilesHandler::getModificationDate(const std::filesystem::path &path) {
     if (!std::filesystem::exists(path)) {
@@ -48,28 +17,18 @@ time_t FilesHandler::getModificationDate(const std::filesystem::path &path) {
 }
 
 void FilesHandler::syncFile(const std::filesystem::path &path, const UpdateData &update_data) const {
-    if (update_data.change == Created and update_data.source == Path1) {
-        std::filesystem::copy_file(path1 / path, path2 / path);
+    if (update_data.source == Both) {
+        throw std::runtime_error("Cannot sync file with conflicts");
     }
-    else if (update_data.change == Created and update_data.source == Path2) {
-        std::filesystem::copy_file(path2 / path, path1 / path);
-    }
-    else if (update_data.change == Updated and update_data.source == Path1) {
-        std::filesystem::remove(path2 / path);
-        std::filesystem::copy_file(path1 / path, path2 / path, std::filesystem::copy_options::overwrite_existing);
-    }
-    else if (update_data.change == Updated and update_data.source == Path2) {
-        std::filesystem::remove(path1 / path);
-        std::filesystem::copy_file(path2 / path, path1 / path, std::filesystem::copy_options::overwrite_existing);
-    }
-    else if (update_data.change == Deleted and update_data.source == Path1) {
-        std::filesystem::remove(path1 / path);
-    }
-    else if (update_data.change == Deleted and update_data.source == Path2) {
-        std::filesystem::remove(path2 / path);
-    }
-    else {
-        throw std::runtime_error("There are conflicts! Aborted");
+    const std::filesystem::path source = (update_data.source == Path1 ? path1 : path2) / path;
+    const std::filesystem::path destination = (update_data.source == Path1 ? path2 : path1) / path;
+
+    std::filesystem::remove(destination);
+    if (update_data.change == Updated || update_data.change == Created) {
+        if (!std::filesystem::exists(destination.parent_path())) {
+            std::filesystem::create_directories(destination.parent_path());
+        }
+        std::filesystem::copy_file(source, destination, std::filesystem::copy_options::overwrite_existing);
     }
 }
 
@@ -87,12 +46,26 @@ FilesHandler::FilesHandler(
     if (std::filesystem::canonical(path2).string().starts_with(std::filesystem::canonical(path1).string())) {
         throw std::runtime_error("Path2 cannot be a subdirectory of Path1");
     }
-    setPath1(path1);
-    setPath2(path2);
-    setLastSync(last_sync);
-    setFiles(files);
+    if (!std::filesystem::exists(path1)) {
+        throw std::runtime_error(path1.generic_string() + " does not exist");
+    }
+    if (!std::filesystem::is_directory(path1)) {
+        throw std::runtime_error(path1.generic_string() + " is not a directory");
+    }
+    this->path1 = std::filesystem::canonical(path1);
+
+    if (!std::filesystem::exists(path2)) {
+        throw std::runtime_error(path2.generic_string() + " does not exist");
+    }
+    if (!std::filesystem::is_directory(path2)) {
+        throw std::runtime_error(path2.generic_string() + " is not a directory");
+    }
+    this->path2 = std::filesystem::canonical(path2);
+
+    this->last_sync = last_sync;
+    this->files = files;
     if (files.empty()) {
-        setFiles(findFiles(path1));
+        this->files = findFiles(path1);
     }
 }
 
@@ -147,7 +120,7 @@ void FilesHandler::findUpdates() {
     std::vector<std::filesystem::path> files1 = findFiles(path1);
     std::vector<std::filesystem::path> files2 = findFiles(path2);
     if (files.empty()) {
-        setFiles(files1);
+        this->files = files1;
     }
 
     // Find all modified / deleted files
@@ -222,8 +195,25 @@ void FilesHandler::findUpdates() {
     }
 }
 
+void FilesHandler::resolveConflicts(const ChangeSource source) {
+    if (source == Both) {
+        throw std::runtime_error("Cannot resolve conflicts for both sources");
+    }
+    if (updates.empty()) {
+        throw std::runtime_error("There are no conflicts to resolve");
+    }
+    for (auto &[path, updateData] : updates) {
+        if (updateData.source == Both) {
+            syncFile(path, UpdateData(Deleted, source));
+        }
+    }
+}
+
 void FilesHandler::syncFiles() {
     findUpdates();
+    if (updates.empty()) {
+        throw std::runtime_error("There are no changes in the files");
+    }
     int conflict_count = 0;
     for (const auto &[change, source]: updates | std::views::values) {
         if (source == Both) {
@@ -236,8 +226,8 @@ void FilesHandler::syncFiles() {
     for (auto &[path, update_data] : updates) {
         syncFile(path, update_data);
     }
-    setLastSync(time(nullptr));
-    setFiles(findFiles(path1));
+    this->last_sync = time(nullptr);
+    this->files = findFiles(path1);
 }
 
 std::ostream & operator<<(std::ostream &os, const FilesHandler &fh) {
