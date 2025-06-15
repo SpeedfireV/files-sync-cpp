@@ -3,16 +3,20 @@ project(FileSynchronizer)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(FileSynchronizer main.cpp
-        SyncJSON/SyncJSON.h
+# Core library
+add_library(FileSynchronizerLib
         SyncJSON/SyncJSON.cpp
-        UpdateData/UpdateData.h
         UpdateData/UpdateData.cpp
-        FilesSynchronizerApp/FilesSynchronizerApp.h
         FilesSynchronizerApp/FilesSynchronizerApp.cpp
-        FilesSynchronizer/FilesSynchronizer.h
         FilesSynchronizer/FilesSynchronizer.cpp
-        FilesHandler/FilesHandler.h
-        FilesHandler/FilesHandler.cpp)
+        FilesHandler/FilesHandler.cpp
+)
 
-add_executable(Test test.cpp)
+target_include_directories(FileSynchronizerLib PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR})
+
+# Main executable
+add_executable(FileSynchronizer main.cpp)
+target_link_libraries(FileSynchronizer FileSynchronizerLib)
+
+add_subdirectory(Google_tests)

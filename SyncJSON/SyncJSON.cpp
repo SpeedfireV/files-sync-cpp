@@ -34,7 +34,7 @@ std::map<std::string, FilesHandler> SyncJSON::loadJSON() const {
             files.emplace_back(file_string);
         }
 
-        result.emplace(entryName, FilesHandler(firstPath, secondPath, lastSync, files));
+        result.try_emplace(entryName, FilesHandler(firstPath, secondPath, lastSync, files));
     }
 
     return result;
