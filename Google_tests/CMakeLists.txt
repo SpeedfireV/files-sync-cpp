@@ -9,6 +9,13 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 # Now simply link against gtest or gtest_main as needed. Eg
-add_executable(test file_synchronizer_lib_unit_test.cpp)
-target_link_libraries(test gtest_main)
-add_test(NAME example_test COMMAND test)
+add_executable(googletest
+        SyncJsonTests.cpp
+        FilesHandlerTTests.cpp
+        FilesSynchronizerTests.cpp
+)
+
+target_link_libraries(googletest
+        gtest_main
+        FileSynchronizerLib)  # ✅ Use the library target
+add_test(NAME googletest_test COMMAND googletest)

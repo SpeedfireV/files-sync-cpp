@@ -1,21 +1,25 @@
 #ifndef FILES_SYNCHRONIZER_APP_H
 #define FILES_SYNCHRONIZER_APP_H
 
-#include <iomanip>
-#include <iostream>
 #include <string>
 #include <vector>
-#include "../files_synchronizer_lib/files_synchronizer/files_synchronizer.h"
+#include "../FilesSynchronizer/FilesSynchronizer.h"
 
 enum class CommandCode {
     none = 0,
     help,
+    load,
+    save,
     add,
     remove,
     clear,
     list,
     sync,
+    conflicts,
+    resolve,
     exit,
+    yes,
+    no
 };
 
 class FilesSynchronizerApp {
@@ -25,18 +29,25 @@ private:
     unsigned char argc = 0;
     std::vector<std::string> argv;
 
+    void getInput();
     void stringToCode(std::string const& str);
-    void parseCommand(const std::string& input);
+    bool areYouSure();
 
     void help() const;
+    void load();
+    void save();
     void add();
     void remove();
     void clear();
-    void list();
+    void list() const;
     void sync();
-    void exit();
+    void conflicts() const;
+    void resolve();
+    void exit() const;
 
 public:
+    FilesSynchronizerApp();
+    explicit FilesSynchronizerApp(const std::string& json_path);
     void run();
 };
 

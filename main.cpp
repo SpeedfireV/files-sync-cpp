@@ -1,8 +1,7 @@
-#include "files_synchronizer_app/FilesSynchronizerApp.h"
+#include "FilesSynchronizerApp/FilesSynchronizerApp.h"
 
 
 int main() {
-    FilesSynchronizerApp app;
+    auto app = FilesSynchronizerApp();
     app.run();
-    return 0;
 }
