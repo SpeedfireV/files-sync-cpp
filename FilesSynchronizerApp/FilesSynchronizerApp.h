@@ -46,6 +46,7 @@ private:
     void exit() const;
 
 public:
+    FilesSynchronizerApp();
     explicit FilesSynchronizerApp(const std::string& json_path);
     void run();
 };

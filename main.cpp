@@ -2,6 +2,6 @@
 
 
 int main() {
-    FilesSynchronizerApp app = FilesSynchronizerApp("C:\\Users\\wkrynski\\Documents\\GitHub\\Studia\\Inne\\FileSynchronizer\\SyncFile.json");
+    auto app = FilesSynchronizerApp();
     app.run();
 }

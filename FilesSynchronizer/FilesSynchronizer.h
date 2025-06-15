@@ -11,6 +11,7 @@ private:
     std::map<std::string, FilesHandler> fileHandlers; // all FilesHandler objects to synchronize
     SyncJSON syncJSON; // An object for saving and loading a JSON file
 public:
+    FilesSynchronizer() = default; // Default constructor
     explicit FilesSynchronizer(const std::string& json_path); // Specify JSON file path at initialization
 
     void setJSONPath(const std::string& json_path); // Set JSON file path

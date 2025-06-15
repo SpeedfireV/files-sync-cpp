@@ -199,6 +199,8 @@ void FilesSynchronizerApp::exit() const {
     std::cout << "Exiting...\n";
 }
 
+FilesSynchronizerApp::FilesSynchronizerApp() : fs(FilesSynchronizer()) {}
+
 FilesSynchronizerApp::FilesSynchronizerApp(const std::string &json_path)
     : fs(FilesSynchronizer(json_path)) {}
 
@@ -206,8 +208,10 @@ void FilesSynchronizerApp::run() {
     std::cout << "Welcome to files synchronizer\n";
     std::cout << "Type 'help' for list of commands\n";
     std::cout << "Type 'exit' to exit\n";
-    fs.loadData();
-    std::cout << "Loaded data from file\n";
+    try {
+        fs.loadData();
+        std::cout << "Loaded data from file\n";
+    } catch (std::exception& e) {}
 
     while (true) {
         getInput();

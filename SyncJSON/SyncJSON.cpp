@@ -14,11 +14,14 @@ SyncJSON::SyncJSON(const std::filesystem::path& filePath) {
 }
 
 std::map<std::string, FilesHandler> SyncJSON::loadJSON() const {
+    if (filePath.empty()) {
+        throw std::runtime_error("JSON file path is empty");
+    }
     std::map<std::string, FilesHandler> result;
 
     std::ifstream file(filePath);
     if (!file.is_open()) {
-        throw std::runtime_error("File could not be opened");
+        throw std::runtime_error("JSON file could not be opened");
     }
 
     nlohmann::json json;
@@ -41,6 +44,9 @@ std::map<std::string, FilesHandler> SyncJSON::loadJSON() const {
 }
 
 void SyncJSON::saveJSON(const std::map<std::string, FilesHandler> &data) const {
+    if (filePath.empty()) {
+        throw std::runtime_error("JSON file path is empty");
+    }
     if (std::filesystem::exists(filePath)) {
         std::filesystem::remove(filePath.string() + ".old");
         std::filesystem::copy_file(
@@ -68,12 +74,12 @@ void SyncJSON::saveJSON(const std::map<std::string, FilesHandler> &data) const {
 
         std::ofstream file(filePath);
         if (!file.is_open()) {
-            throw std::runtime_error("File could not be opened");
+            throw std::runtime_error("JSON file could not be opened");
         }
 
         file << std::setw(4) << json << std::endl;
         if (file.fail()) {
-           throw std::runtime_error("File could not be written");
+           throw std::runtime_error("JSON file could not be written");
         }
     }
     catch (std::exception& e) {
