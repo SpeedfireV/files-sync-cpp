@@ -32,7 +32,7 @@ Celem projektu było stworzenie aplikacji do synchronizacji plików pomiędzy r�
 
 Przed rozpoczęciem projektu rozplanowaliśmy całą strukturę rozrysowując schemat UML, jednak w trakcie realizacji projektu okazało się, że można wprowadzić liczne zmiany usprawniające działanie całej biblioteki.
 
-![Oryginalny Schemat Projektu](https://github.com/SpeedfireV/files-sync-cpp/UML.png)
+![Oryginalny Schemat Projektu](https://github.com/SpeedfireV/files-sync-cpp/blob/main/UML.png)
 
 Projekt zdecydowanie pomógł nam jeszcze bardziej zaznajomić się z obsługą plików oraz de/serializowaniem plików json w C++. 
 
