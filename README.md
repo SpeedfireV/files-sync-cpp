@@ -1,5 +1,8 @@
 # Files Synchronizer
 
+## Autorzy
+Grzegorz Niespodziany ([@SpeedfireV](https://github.com/SpeedfireV)) \
+Wojciech Kryński ([@WITEX121](https://github.com/WITEX121))
 
 ## Założenia projektu
 
